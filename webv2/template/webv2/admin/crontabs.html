@@ -1,0 +1,60 @@
+{% extends "webv2/base.html" %}
+{% block title %}Console{% endblock %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+    <div class="box box-info online_devices">
+      <div class="box-header with-border">
+        <h3 class="box-title">用户管理</h3>
+        <div class="box-tools pull-right">
+          <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+          <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>User</th>
+              <th>App</th>
+              <th>Crontab Type</th>
+              <th>Create Time</th>
+              <th>Pin Edge</th>
+              <th>Management</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ct in records %}
+            <tr>
+              <td>{{ct.id}}</td>
+              <td>{{ct.name}}</td>
+              <td>{{ct.user.email}}</td>
+              <td>{{ct.app.app_name}}</td>
+              <td>{{ct.get_crontype_display}}</td>
+              <td>{{ct.create_time}}</td>
+              <td>{{ct.pin}} - {{ct.edge}}</td>
+              <td>
+                <a href="javascript:;" title="未实现！">禁用</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">暂空</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

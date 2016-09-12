@@ -1,0 +1,69 @@
+{% extends "webv2/base.html" %}
+{% load common_tags %}
+{% block title %}Console{% endblock %}
+{% load i18n %}
+
+{% block css %}
+<style>
+  img.avatar {
+    width: 40px;
+    height: 40px;
+  }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+    <div class="box box-info online_devices">
+      <div class="box-header with-border">
+        <h3 class="box-title">用户管理</h3>
+        <div class="box-tools pull-right">
+          <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+          <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>avatar</th>
+              <th>Nickname</th>
+              <th>Bound User</th>
+              <th>Province City</th>
+              <th>Subscribe Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in records %}
+            <tr>
+              <td><img class="avatar" src="{{user.info.headimgurl}}" alt=""></td>
+              <td>{{user.info.nickname}}</td>
+              <td>
+                {% if user.user %}
+                {{user.user.email}}
+                {% endif %}
+              </td>
+              <td><span>{{user.info.province}}</span> <span>{{user.info.city}}</span></td>
+              <td>{{user.info.subscribe_time | timestamp}}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">暂空</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box-footer">
+      {% include "webv2/paginator.html" %}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

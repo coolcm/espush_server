@@ -1,0 +1,245 @@
+{% extends "webv2/base.html" %}
+{% load i18n %}
+{% load static from staticfiles %}
+{% block title %}APPS{% endblock %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">现存设备类别(Apps)</h3>
+      </div><!-- /.box-header -->
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover table-responsive">
+          <tr>
+            <th>{% trans '编号(AppID)' %}</th>
+            <th>{% trans '分类名' %}</th>
+            <th>{% trans '连接密钥' %}(AppKey)</th>
+            <th>{% trans '分类操作' %}</th>
+          </tr>
+          {% for app in apps %}
+          <tr id = "app-tr-{{app.id}}">
+            <td>{{app.id}}</td>
+            <td>{{app.app_name}}</td>
+            <td>{{app.secret_key}}</td>
+            <td>
+              <a href="javascript:;" onclick="remove_app('{{app.id}}');" title="点此删除，不可恢复，小心操作">
+                <i class="icon-remove"></i>{% trans '删除' %}
+              </a>
+              <a href="javascript:;" onclick="show_qrcode('{{app.id}}', '{{app.secret_key}}');" title="点此使用手机App扫描二维码添加设备类别">
+                <i class="icon-qrcode"></i>{% trans '二维码' %}
+              </a>
+              <!--<a href="javascript:;" onclick="set_notice('{{app.id}}', '{{app.secret_key}}');" title="设置数据回调地址，设备上传数据时服务器将自动回调此地址">-->
+                <!--<i class="icon-reply"></i>{% trans '数据实时通知' %}-->
+              <!--</a>-->
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">{% trans '暂空' %}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div><!-- /.box-body -->
+
+      <div class="box-footer">
+
+        <form method="post" id="appform" onsubmit="return validateForm()">
+          {% csrf_token %}
+          <div class="input-group col-md-4">
+            <label class="sr-only" for="app_here">Email address</label>
+            <input class="form-control" placeholder="app名称" type="text" name='app' id="app_here">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit">{% trans '新增' %}</button>
+            </span>
+          </div><!-- /input-group -->
+        </form>
+      </div>
+
+
+    </div><!-- /.box -->
+  </div>
+</div>
+{% endblock %}
+
+{% block outerbody %}
+<div id="qrcode" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="qrcode">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="padding: 10px;">
+      <div id="qrcode_img"></div>
+    </div>
+  </div>
+</div>
+
+
+<div id="set_notice_dlg" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="set_notice_dlg">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Device push Callback</h3>
+      </div>
+      <div class="modal-body">
+      <div class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for="inputAddr">API Address:</label>
+          <div class="controls">
+            <input type="text" id="inputAddr" class="form-control" placeholder="Your API Server addr.">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="inputToken">API Token:</label>
+          <div class="controls">
+            <input type="text" id="inputToken" class="form-control" placeholder="API Token, default random string.">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="inputToken">Description:</label>
+          <div class="controls">
+            <span class="help-block">When push msg arrive, We will call your API with arguments appid, sign, msg, timestamp, token. the API TEST use HTTP GET method without msg argument, and Message callback use POST. Your message will use base64 encode.</span>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success api_opr_btn" id="apitestbtn">API TEST</button>
+        <button class="btn btn-danger api_opr_btn" id="apidisablebtn">Delete/Disable</button>
+        <button class="btn btn-primary api_opr_btn" id="saveapibtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'webv2/js/qrcode.min.js' %}"></script> 
+<script>
+function validateForm() {
+  var x = document.forms["appform"]["app"].value;
+  if (x == null || x == "") {
+    alert("app必须填写");
+    return false;
+  }
+}
+
+function remove_app(appid)
+{
+  var iRet = confirm("删除设备类型APP后将无法恢复\n\n使用此APPKEY的设备及服务端SDK亦将同时失效\n"+
+  "如您需要继续管理您的设备，需要重新添加新的APP，并在设备上使用新的APPID与APPKEY登录平台\n" +
+  "当前已连入系统的在线设备并不会强制下线，但重启后将无法登入系统。\n\n\n" +"请您确认后继续.");
+  if(!iRet) {
+    return 0;
+  }
+  
+  var res = $.post('/webv2/remove_app/' + appid + '/');
+  res.done(function(obj) {
+    $("tr#app-tr-" + appid).empty();
+  });
+  
+}
+
+function show_qrcode(appid, appkey)
+{
+  $("#qrcode_img").empty();
+  new QRCode("qrcode_img", appid + "-" + appkey);
+    $('#qrcode').modal({keyboard: true});
+}
+
+
+var set_notice = function(appid) {
+  console.log("set_notice");
+  var url = "/webv2/notice_opr/" + appid + "/";
+  var get_req = $.getJSON(url);
+  get_req.success(function(obj) {
+    $("input#inputAddr").val(obj.addr);
+    $("input#inputToken").val(obj.token);
+  });
+
+  get_req.fail(function(obj) {
+    $("input#inputAddr")[0].focus();
+  });
+
+  get_req.always(function() {
+    $("input#inputAddr")[0].focus();
+  });
+
+  $("div#set_notice_dlg").modal();
+  //三个按钮附着data-appid
+  var btns = $("button.api_opr_btn")
+  var length = btns.length;
+  for(var i=0; i!=length; ++i) {
+    btns[i].dataset["appid"] = appid;
+  }
+};
+
+$("button#apitestbtn").click(function() {
+  var appid = $(this)[0].dataset["appid"];
+  var url = "/webv2/notice_opr/" + appid + "/";
+  var test_req = $.post("/webv2/notice_api_test/" + appid + "/", {
+    addr: $("input#inputAddr").val(),
+    token: $("input#inputToken").val()
+  });
+
+  test_req.success(function(obj) {
+    console.log(arguments);
+    if(obj.code === 1) {
+      return alert("request error: " + obj.msg);
+    } else {
+      return alert("API TEST OK.");
+    }
+  });
+
+  test_req.fail(function(obj) {
+    return alert("Request error.");
+  });
+});
+
+$("button#saveapibtn").click(function() {
+  var appid = $(this)[0].dataset["appid"];
+  var url = "/webv2/notice_opr/" + appid + "/";
+  console.log("button#saveapibtn");
+  var addr = $("input#inputAddr").val();
+  if(!addr) {
+    alert("address empty.");
+    return;
+  }
+
+  var token = $("input#inputToken").val();
+  if(!token) {
+    alert("token empty.");
+    return;
+  }
+
+  var save_req = $.ajax({
+    type: 'PUT',
+    url: url,
+    data: {
+      addr: $("input#inputAddr").val(),
+      token: $("input#inputToken").val()
+    }
+  });
+
+  save_req.success(function(obj) {
+    $("div#set_notice_dlg").modal('toggle');
+  });
+  save_req.fail(function(obj) {
+    alert("request failed.");
+  });
+});
+
+$("button#apidisablebtn").click(function() {
+  var appid = $(this)[0].dataset["appid"];
+  var url = "/webv2/notice_opr/" + appid + "/";
+  var del_req = $.ajax({type: 'DELETE',url: url});
+  del_req.success(function(obj) {
+    $("div#set_notice_dlg").modal('toggle');
+  });
+  del_req.fail(function() {
+    alert("request failed.");
+  });
+});
+
+</script>
+{% endblock %}

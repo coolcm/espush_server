@@ -1,0 +1,18 @@
+# for django
+django==1.8
+requests
+redis
+pillow==3.1
+six
+psycopg2==2.6.1
+pytz
+
+# for gateway
+twisted==15.0
+apscheduler==3.0.5
+sqlalchemy==0.9.6
+netifaces==0.10.4
+pg8000==1.10.6
+
+# for production
+#uwsgi==2.0

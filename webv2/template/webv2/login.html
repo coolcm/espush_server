@@ -1,0 +1,39 @@
+{% extends "webv2/login_page.html" %}
+{% block title %}Sign In{% endblock %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+<div class="login-box-body">
+  <p class="login-box-msg">Sign in to start your session</p>
+  <form action="{% url 'webv2_login' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group has-feedback">
+      <input type="email" name="email" class="form-control" placeholder="Email">
+      <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+    </div>
+    <div class="form-group has-feedback">
+      <input type="password" name="password" class="form-control" placeholder="Password">
+      <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+    </div>
+    <div class="row">
+      <div class="col-xs-8">
+        <div class="checkbox">
+          <label>
+            <input name="remember" type="checkbox"> Remember Me
+          </label>
+        </div>
+      </div><!-- /.col -->
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+      </div><!-- /.col -->
+    </div>
+  </form>
+
+  <a href="{% url 'webv2_forgot' %}" class="ajax_loading" data-dest="div.login-box-body" data-src="div.login-box-body">I forgot my password</a><br>
+  <a href="{% url 'webv2_register' %}" class="text-center ajax_loading" data-dest="div.login-box-body" data-src="div.login-box-body">Register a new membership</a>
+
+</div><!-- /.login-box-body -->
+
+{% endblock %}

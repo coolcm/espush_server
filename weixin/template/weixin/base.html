@@ -1,0 +1,44 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="renderer" content="webkit|ie-comp|ie-stand">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{% block title %}{% endblock %} - ESPUSH</title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  {% block css %}{% endblock %}
+</head>
+<body>
+{% block body_content %}{% endblock %}
+
+<script src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+<script>
+/*wechat jssdk init*/
+wx.config({
+	debug: false,
+	beta: true,
+	appId: '{{ appid }}',
+	timestamp: '{{ jssdk_cfg.timestamp }}',
+	nonceStr: '{{ jssdk_cfg.nonceStr }}',
+	signature: '{{ jssdk_cfg.signature }}',
+	jsApiList: ['chooseImage', 'uploadImage', 'configWXDeviceWiFi', 'startScanWXDevice', 'stopScanWXDevice', 'openWXDeviceLib', 'closeWXDeviceLib', 'closeWindow']
+});
+
+wx.ready(function() {
+	return wxready();
+});
+
+wx.error(function(res) {
+	alert("WX CONFIG FAIL");
+	return wxerror();
+});
+
+</script>
+
+{% block javascript %}
+{% endblock %}
+</body>
+</html>

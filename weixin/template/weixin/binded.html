@@ -1,0 +1,23 @@
+{% extends "weixin/base.html" %}
+{% load static from staticfiles %}
+{% block title %}Bind WeChat{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'webv2/css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'webv2/css/AdminLTE.min.css' %}">
+{% endblock %}
+
+{% block body_content %}
+<div class="login-box">
+  <div class="login-logo">
+    <a href="/">用户<b>已绑定</b></a>
+  </div>
+
+    <div class="login-box-body">
+      <p class="login-box-msg">已绑定，无需重复绑定，若需更换用户请取消关注后重新操作。</p>
+    </div><!-- /.login-box-body -->
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

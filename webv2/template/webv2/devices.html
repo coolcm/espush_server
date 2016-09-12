@@ -1,0 +1,442 @@
+{% extends "webv2/base.html" %}
+{% load i18n %}
+{% load static from staticfiles %}
+{% block title %}Online Devices{% endblock %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">{% trans '在线设备' %}</h3>
+      </div><!-- /.box-header -->
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover table-responsive">
+          <tr>
+            <th>{% trans '芯片ID' %}</th>
+            <th>{% trans 'APP类别' %}</th>
+            <th>{% trans '固件类型' %}</th>
+            <th>{% trans '最后确认时间点' %}</th>
+            <th>{% trans '设备操作' %}</th>
+          </tr>
+        <tbody>
+        {% for device in devs %}
+          <tr class="each_dev" data-chipid="{{device.devid}}"
+            data-appid="{{device.appobj.id}}"
+            data-appkey="{{device.appobj.secret_key}}"
+            data-romtype="{{device.vertype}}">
+            <td>
+              {{device.devid}}
+              {% if device.devname %}
+              - {{device.devname}}
+              {% endif %} <a href="javascript:;" class="note_devices"><i class="fa fa-credit-card"></i> 备注</a>
+            </td>
+            <td>{{device.appname}}</td>
+            <td class="dev_vertype_td" data-val="{{device.vertype}}"></td>
+            <td title="{% trans '服务器时间，可能快于本机时间' %}">{{device.latest}}</td>
+            <td>
+              <a href="javascript:;" data-id="{{device.devid}}" data-appid="{{device.appobj.id}}" class="push_dev">
+                <i class="fa fa-comment" title="{% trans '数据单推' %}"></i>{% trans '推送' %}
+              </a>
+              <a href="javascript:;" data-id="{{device.devid}}" data-appid="{{device.appobj.id}}" class="dev_refresh">
+                <i class="fa fa-fw fa-spinner" title="{% trans '刷新设备状态' %}"></i>{% trans '刷新' %}
+              </a>
+              <a href="javascript:;" class="uartrans_wifi">
+                <i class="fa fa-bell" title="数据从设备采集时收取实时通知"></i> 透传&amp;通知
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">{% trans '暂空' %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+      </div><!-- /.box-body -->
+
+    </div><!-- /.box -->
+
+  <div class="alert alert-success alert-dismissable animation_dlg" style="display: none;">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h4>	<i class="icon fa fa-check"></i> 刷新完成</h4>
+    刷新已完成，设备在线状态良好。
+  </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block outerbody %}
+<div class="modal fade" id="pushModel" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title" id="pushModelLabel">{% trans '单推至设备 芯片ID:' %}<span id="dev_id_label"></span></h3>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="cmd_type">{% trans '指令类型' %}</label>
+            <div class="controls col-sm-10">
+                <select class="form-control" name="cmd_type" id="cmd_type">
+                  <option value="MSG">{% trans '文本数据' %}</option>
+                  <option value="HEX">{% trans '原始数值 HEX' %}</option>
+                  <option value="AT">{% trans ' A T指令' %}</option>
+                  <option value="LUA">{% trans 'LUA指令' %}</option>
+                </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="msg" class="control-label col-sm-2">推送内容</label>
+            <div class="controls col-sm-10">
+              <textarea id="msg" rows="3" cols="20" name="msg" class="form-control" placeholder="需要推送至设备的的消息或指令" autofocus></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        {% blocktrans %}
+        <p style="text-align: left;"><strong>注意:</strong> 文本数据即所见即所得，原样推送至设备，适合使用SDK库进行自定义固件的开发者，原始数值为HEX十六进制表示，只能输入十六进制数据，
+        即仅限于(0~9, A~F)，亦无需空格。
+        AT指令仅限于AT固件，且使用AT指令推送仅限单行命令，外加64字节长度限制，不得一次推送多个命令。Lua指令亦限于NodeMCU固件，请谨慎输入Lua指令，太大的指令或错误的指令可能导致设备锁死或重启。
+        错误选择指令类型将导致发送失败或指令运行失败。</p>
+        {% endblocktrans %}
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans '关闭' %}</button>
+        <button class="btn btn-primary push_msg_to_dev" data-id="">{% trans '确认推送' %}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="row console_row_origin" style="padding-top: 0.5em;display: none">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box box-solid">
+      <div class="box-header with-border">
+        <i class="fa fa-coffee"></i>
+        <h3 class="box-title">{% trans '数据上传 - 实时通知' %} - <span class="chipid_title"></span></h3>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+          <textarea class="form-control" id="textarea notification_body" rows="6" placeholder="" readonly="readonly"  style="min-height: 160px;"></textarea>
+      </div><!-- /.box-body -->
+      <div class="box-footer">
+        <div class="input-group">
+          <input type="text" class="form-control" id="stream_line" placeholder="WIFI 云透传">
+          <span class="input-group-btn">
+            <button class="btn btn-success" type="button">透传至设备串口</button>
+          </span>
+        </div>
+      </div>
+    </div><!-- /.box -->
+  </div><!-- ./col -->
+</div>
+
+<div class="alert" style="display:none">透传内容不得为空.</div>
+{% endblock %}
+
+
+{% block js %}
+<script type="application/javascript" src="{% static 'webv2/js/md5.min.js' %}"></script>
+<script type="application/javascript">
+function note_device(appid, chipid) {
+  var name = window.prompt("备注名称？");
+  if(!name) {
+    return;
+  }
+  if(!appid) {
+    return;
+  }
+  
+  $.ajax({
+    type:"POST",
+    url:"/webv2/note_name/" + appid + "/" + chipid + "/",
+    data: {
+      'name': name
+    },
+    success: function(obj) {
+      alert("修改成功");
+      window.location.href='';
+    },
+    error: function(xhr, err, inf) {
+      alert("失败了");
+      console.log(xhr);
+      console.log(err);
+      console.log(inf);
+    }
+  });
+}
+
+function getSignBuf(method, appid, appkey, timestamp, param) {
+  param['timestamp'] = timestamp;
+  param['appid'] = appid;
+  
+  var sorted = [];
+  for(var key in param) {
+    if(param.hasOwnProperty(key)) {
+      sorted[sorted.length] = key;
+    }
+  }
+  sorted.sort();
+  sorted.reverse();
+  
+  var buf = method;
+  for(var i=0; i != sorted.length; ++i) {
+    buf += sorted[i];
+    buf += '=';
+    buf += param[sorted[i]];
+    if(i !== sorted.length - 1) {
+      buf += "&";
+    }
+  }
+  buf += appkey;
+  buf = buf.toLowerCase();
+  console.log(buf);
+  return buf;
+}
+
+function get_notice_ws_url(appid, appkey, chipid) {
+  var timestamp = (new Date()).getTime();
+
+  var args = {
+    'appid': appid,
+    'timestamp': timestamp,
+    'chipid': chipid
+  };
+
+  var sign = md5(getSignBuf('GET', appid, appkey, timestamp, {'chipid': chipid}));
+  args['sign'] = sign;
+
+  var url = "wss://espush.cn/noticed/peer?" + $.param(args);
+  return url;
+
+}
+
+
+function notifyme(text) {
+  // Let's check if the browser supports notifications
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  }
+
+  // Let's check whether notification permissions have already been granted
+  else if (Notification.permission === "granted") {
+    // If it's okay let's create a notification
+    var notification = new Notification(text);
+  }
+
+  // Otherwise, we need to ask the user for permission
+  else if (Notification.permission !== 'denied') {
+    Notification.requestPermission(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        var notification = new Notification(text);
+      }
+    });
+  }
+}
+
+function upload_notification(appid, appkey, chipid) {
+  var el = $("div.console_row_origin").clone().appendTo("section.content");
+  el.removeClass("console_row_origin").addClass("upload_notification").show();
+  el.find("span.chipid_title")[0].innerHTML = chipid;
+
+  var ws_url = get_notice_ws_url(appid, appkey, chipid);
+  console.log("websocket to: " + ws_url);
+
+  var ws = new WebSocket(ws_url);
+
+  var textarea = el.find("textarea")[0];
+  var addText = function(text) {
+    textarea.textContent = textarea.textContent + text;
+    notifyme(text);
+  };
+
+  ws.onopen = function() {
+    console.log("websocket connection made.");
+
+    el.on("click", "button", function() {
+      var stream_line = el.find("input#stream_line")
+      var stream_text = stream_line.val();
+      if(!stream_text) {
+        var alert = el.find("div.alert");
+        alert.show();
+        setTimeout(function() {
+          alert.hide();
+        }, 2000);
+        return;
+      }
+      var url = "/webv2/uart_stream_push/" + chipid + "/";
+      var req = $.post(url, {'msg': stream_text});
+      req.success(function(obj) {
+        stream_line.val("");
+      });
+      req.fail(function(err) {
+        alert("Error: " + JSON.parse(err.responseText)['msg']);
+        console.log(arguments);
+      });
+      req.always(function() {
+        //
+      });
+    });
+  };
+
+  ws.onmessage = function(evt) {
+    var msg = JSON.parse(evt.data);
+    var up_msg = atob(msg.body);
+    addText(up_msg);
+    console.log(evt);
+  };
+
+  ws.onclose = function(evt) {
+    alert("连接断开");
+    el.empty();
+  };
+
+  ws.onerror = function(evt) {
+    alert("连接出现error");
+  };
+}
+
+function cloud_program(evt) {
+  var appid = window.swap_context_src_event.currentTarget.dataset['appid'];
+  var romtype = window.swap_context_src_event.currentTarget.dataset['romtype'];
+  var chipid = window.swap_context_src_event.currentTarget.dataset['chipid'];
+  if(romtype !== "2") {
+    alert("此功能仅限于NodeMCU固件，暂不支持您的模块。");
+    return;
+  }
+
+  if(!chipid) {
+    alert("无效设备编号");
+    return;
+  }
+
+  window.location.href="/webv2/nodemcu/editor/" + appid + "/" + chipid + "/";
+}
+
+$(document).ready(function() {
+	var td_els = $("td.dev_vertype_td");
+	for(var i=0; i !== td_els.length; ++i) {
+		var ver_val = td_els[i].getAttribute("data-val");
+		var ver_type = "";
+		if(ver_val === "0") {
+			ver_type = "未知";
+		} else if (ver_val === "1") {
+			ver_type = "AT";
+		} else if (ver_val === "2") {
+			ver_type = "NodeMCU";
+		} else if (ver_val === "3") {
+			ver_type = "SDK";
+		} else if (ver_val === "4") {
+			ver_type = "其他";
+		} else {
+			ver_type = "未知";
+		}
+		
+		td_els[i].innerHTML = ver_type;
+    /*
+    var editor_href = $(td_els[i]).closest("tr").find("a.nodemcu_lua_editor_href")[0];
+    if(ver_val === "2") {
+      var dataset = $(editor_href).closest("tr")[0].dataset;
+      var appid = dataset['appid'];
+      var chipid = dataset['chipid'];
+
+      editor_href.style.display = "";
+      editor_href.href = "/webv2/nodemcu/editor/" + appid + "/" + chipid + "/";
+    }
+    */
+	}
+
+  $("a.push_dev").click(function() {
+    var chipid = $(this).attr("data-id");
+    var appid = $(this).attr("data-appid");
+    $("span#dev_id_label")[0].innerHTML = chipid;
+    $("button.push_msg_to_dev").attr("data-id", chipid);
+    $("button.push_msg_to_dev").attr("data-appid", appid);
+    $("textarea#msg")[0].value = "";
+    $('div#pushModel').modal('toggle');
+  });
+
+  $("button.push_msg_to_dev").click(function() {
+    var msg = $("textarea#msg")[0].value;
+    var chipid = $(this).attr("data-id");
+    var appid = $(this).attr("data-appid");
+    var msgformat = $('#cmd_type').find(":selected").val();
+    var params = {'msg': msg, 'format': msgformat};
+    var action = $.post('/webv2/push/single_dev/' + appid + '/' + chipid + '/', params);
+    action.done(function(obj) {
+      $('#pushModel').modal('toggle');
+    });
+    action.fail(function(err, xhr, obj) {
+      alert("推送可能失败，请检查:\n" + err.responseText);
+    });
+    
+    action.always(function(obj) {
+      console.log("push msg over~");
+    });
+  });
+
+  $('div#pushModel').on('shown', function () {
+    $("textarea#msg")[0].focus();
+  });
+
+  function refresh_complete_div_animation() {
+    $("div.animation_dlg").show('fast', function() {
+      setTimeout(function() {
+        $("div.animation_dlg").hide('slow');
+      }, 2000)
+    });
+  }
+
+  $("a.dev_refresh").click(function() {
+    var chipid = $(this).attr("data-id");
+    var spiner = this.querySelector("i.fa-spinner");
+    var dom_el_a = this;
+    $.ajax({
+      type: "POST",
+      url: "/webv2/dev_refresh/" + chipid + "/",
+      success: function(text) {
+        console.log("ajax ok");
+        console.log(text);
+        if(text === 'online') {
+          console.log("在线");
+          refresh_complete_div_animation();
+        } else if (text === 'offline') {
+          console.log("设备离线了");
+          $(dom_el_a).closest("tr").empty();
+        }
+      },
+      error: function(xhr, err, inf) {
+        alert("Failed");
+      },
+      complete: function() {
+        spiner.classList.remove("fa-spin");
+      }
+    });
+    spiner.classList.add("fa-spin");
+  });
+
+  $("a.uartrans_wifi").on('click', function(evt) {
+    var dataset = $(this).closest("tr")[0].dataset;
+    var appid = dataset['appid'];
+    var appkey = dataset['appkey'];
+    var chipid = dataset['chipid'];
+
+    upload_notification(appid, appkey, chipid);
+  });
+
+  $("a.note_devices").on('click', function(evt) {
+    var dataset = $(this).closest("tr")[0].dataset;
+    var appid = dataset['appid'];
+    var chipid = dataset['chipid'];
+
+    note_device(appid, chipid);
+  });
+});
+</script>
+{% endblock %}
+

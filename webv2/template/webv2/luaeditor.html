@@ -1,0 +1,134 @@
+{% extends "webv2/base.html" %}
+{% block title %}NodeMCU Lua Editor{% endblock %}
+{% load i18n %}
+{% load static from staticfiles %}
+
+{% block css %}
+<style type="text/css" media="screen">
+    #editor { 
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 400px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box box-solid">
+      <div class="box-header with-border">
+        <i class="fa fa-text-width"></i>
+        <h3 class="box-title">ESPUSH是什么?</h3>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+          <div id="editor" class="col-sm-12"></div>
+      </div><!-- /.box-body -->
+      <div class="box-footer">
+        <button class="btn" id="write_board" title='不执行代码，仅写入文件 _espush.lua'>远程写入</button>
+        <div style="float: right;">编辑器主题: 
+          <select id="editor_theme_select"></select>
+        </div>
+      </div>
+    </div><!-- /.box -->
+  </div><!-- ./col -->
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script src="{% static 'webv2/js/ace/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'webv2/js/ace/ext-language_tools.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'webv2/js/ace/mode-lua.js' %}" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    window.editor = editor;
+    editor.setTheme("ace/theme/monokai");
+    editor.$blockScrolling = Infinity;
+    editor.setOptions({
+      enableBasicAutocompletion: true,
+      enableSnippets: true,
+      enableLiveAutocompletion: true
+    });
+    var session = editor.getSession();
+    session.setMode("ace/mode/lua");
+    session.setUseSoftTabs(true);
+    session.setUseWrapMode(true);
+
+    //auto complete.
+    var autoCompleteData = [
+      {"meta": "function", "caption": "restart", "value": "restart", "score": 1},
+      {"meta": "function", "caption": "dsleep", "value": "dsleep", "score": 2},
+      {"meta": "function", "caption": "info", "value": "info", "score": 3},
+      {"meta": "function", "caption": "chipid", "value": "chipid", "score": 4},
+      {"meta": "function", "caption": "flashid", "value": "flashid", "score": 5},
+      {"meta": "function", "caption": "heap", "value": "heap", "score": 6},
+      {"meta": "function", "caption": "key", "value": "key", "score": 7},
+      {"meta": "function", "caption": "led", "value": "led", "score": 8},
+      {"meta": "function", "caption": "input", "value": "input", "score": 9},
+      {"meta": "function", "caption": "output", "value": "output", "score": 10},
+      {"meta": "function", "caption": "readvdd33", "value": "readvdd33", "score": 11},
+      {"meta": "function", "caption": "compile", "value": "compile", "score": 12},
+      {"meta": "function", "caption": "setcpufreq", "value": "setcpufreq", "score": 13},
+      {"meta": "function", "caption": "restore", "value": "restore", "score": 14}
+    ];
+
+    var tangideCompleter = {
+        getCompletions: function(editor, session, pos, prefix, callback) {
+            if (prefix.length === 0) {
+                return callback(null, []);
+            }else {
+                return callback(null, autoCompleteData);
+            }
+        }
+    };
+    var langTools = ace.require("ace/ext/language_tools");
+    langTools.addCompleter(tangideCompleter);
+
+    //主题更换功能
+    var themes = ["monokai", "katzenmilch", "crimson_editor", "mono_industrial", "textmate", "tomorrow", "twilight", "dawn", "merbivore", "vibrant_ink", "github", "eclipse"];
+    var select_btn = $("select#editor_theme_select");
+    for(pos in themes) {
+      var option = "<option data-name='" + themes[pos] + "'>" + themes[pos] + "</option>";
+      select_btn.append(option);
+    }
+    var btn = select_btn[0];
+    select_btn.on("change", function() {
+      var cur_val = btn.options[btn.selectedIndex].value;
+      var theme_name = "ace/theme/" + cur_val;
+      console.info(theme_name);
+      editor.setTheme(theme_name);
+    });
+
+    $("button#write_board").on("click", function() {
+      var content = editor.getValue();
+      post_content(content, "write_board");
+    });
+
+    function post_content(content, exec_typ) {
+      var url = "";
+      var req = $.post(url, {
+        content: content,
+        exec_type: exec_typ
+      });
+      var alert_dlg = $("div.connecting");
+      alert_dlg.toggle();
+      req.success(function(obj) {
+        console.info("执行成功");
+      });
+      req.fail(function(xhr, err) {
+        console.error(xhr);
+      });
+      req.always(function() {
+        setTimeout(function() {
+          alert_dlg.fadeOut("normal");
+        }, 500);
+      })
+    }
+</script>
+
+{% endblock %}

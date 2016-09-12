@@ -1,0 +1,180 @@
+{% load i18n %}{% load static from staticfiles %}{% load common_tags %}<!DOCTYPE html>
+<html lang="zh-hans">
+  <head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="template_author" content="admin lte">
+    <meta name="website_author" content="espush.cn">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>{% block title %}{% endblock %} - ESPUSH</title>
+    <link rel="stylesheet" href="{% static 'webv2/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'webv2/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'webv2/css/adminlte_skin.min.css' %}">
+    {% block css%}{% endblock %}
+    <link rel="Favicon Icon" href="/favicon.ico">
+    <!--[if lt IE 9]>
+        <script src="{% static 'webv2/js/html5shiv.min.js' %}"></script>
+        <script src="{% static 'webv2/js/respond.min.js' %}"></script>
+    <![endif]-->
+
+    <!-- link prefetch resources.-->
+    <link rel="prefetch" href="{% static 'webv2/css/AdminLTE.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/css/font-awesome.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/css/adminlte_skin.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/app.min.js' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/qrcode.min.js' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/md5.min.js' %}">
+    <!-- link prefetch end. -->
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+      <!-- Main Header -->
+      <header class="main-header">
+
+        <!-- Logo -->
+        <a href="/" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>es</b>push</span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>ES</b>PUSH</span>
+        </a>
+
+        <!-- Header Navbar -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="javascript:;" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+          </a>
+          <!-- Navbar Right Menu -->
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <!-- User Account Menu -->
+              <li class="dropdown user user-menu">
+                <!-- Menu Toggle Button -->
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <!-- The user image in the navbar-->
+                  <img src="{{user.gravatar_url}}" class="user-image" alt="User Image">
+                  <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                  <span class="hidden-xs">{{user.email}}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- The user image in the menu -->
+                  <li class="user-header">
+                    <img src="{{user.gravatar_url}}" class="img-circle" alt="User Image">
+                    <p>
+                      {{user.email}}
+                      <small>{{ user.last_login }}</small>
+                    </p>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <div class="pull-right">
+                      <a href="{% url 'webv2_logout' %}" class="btn btn-default btn-flat"> {% trans "注销" %}</a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <!-- Control Sidebar Toggle Button -->
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- Left side column. contains the logo and sidebar -->
+      <aside class="main-sidebar">
+
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+
+          <!-- Sidebar user panel (optional) -->
+          <div class="user-panel">
+            <div class="pull-left image">
+              <img src="{{user.gravatar_url}}" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+              <p>{{user.email}}</p>
+              <!-- Status -->
+              <!-- <a href="#">Settings</a> -->
+            </div>
+          </div>
+
+          <!-- Sidebar Menu -->
+          <ul class="sidebar-menu">
+            <!-- Optionally, you can add icons to the links -->
+            <li class="{% is_active_resolve request 'webv2_index' %}"><a href="{% url 'webv2_index' %}"><i class="fa fa-home"></i> <span>{% trans "首页" %}</span></a></li>
+
+            <li class="{% is_active_resolve request 'webv2_apps' %}"><a href="{% url 'webv2_apps' %}"><i class="fa fa-pencil"></i> <span>{% trans "设备分类" %}</span></a></li>
+
+            <li class="{% is_active_resolve request 'webv2_devices' 'webv2_iocontrol' %}"><a href="{% url 'webv2_devices' %}"><i class="fa fa-print"></i> <span>{% trans "在线设备" %}</span></a></li>
+
+            <li class="{% is_active_resolve request 'webv2_history' %}"><a href="{% url 'webv2_history' %}"><i class="fa fa-clock-o"></i> <span>{% trans "历史指令" %}</span></a></li>
+
+            <li class="{% is_active_resolve request 'webv2_crontab' %}"><a href="{% url 'webv2_crontab' %}"><i class="fa fa-calculator"></i> <span>{% trans "计划任务" %}</span></a></li>
+            {% if user.is_admin %}
+            <li class="treeview {% is_active_resolve request 'webv2_admin_roms' 'webv2_admin_online_devices' 'webv2_admin_users' 'webv2_admin_wechat_users' 'webv2_admin_crontabs' 'webv2_admin_apps'%}">
+              <a href="javascript:;"><i class="fa fa-desktop"></i> <span>{% trans "运营管理" %}</span> <i class="fa fa-angle-left pull-right"></i></a>
+              <ul class="treeview-menu">
+                <li class="{% is_active_resolve request 'webv2_admin_roms' %}"><a href="{% url 'webv2_admin_roms' %}">{% trans "固件管理" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_admin_online_devices' %}"><a href="{% url 'webv2_admin_online_devices' %}">{% trans "在线设备" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_admin_users' %}"><a href="{% url 'webv2_admin_users' %}">{% trans "用户管理" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_admin_wechat_users' %}"><a href="{% url 'webv2_admin_wechat_users' %}">{% trans "微信用户" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_admin_crontabs' %}"><a href="{% url 'webv2_admin_crontabs' %}">{% trans "计划任务" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_admin_apps' %}"><a href="{% url 'webv2_admin_apps' %}">{% trans "APPS管理" %}</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            <li class="treeview {% is_active_resolve request 'webv2_data_preview' 'webv2_data_graphic'%}">
+              <a href="javascript:;"><i class="fa fa-bar-chart"></i> <span>{% trans "设备数据" %}</span> <i class="fa fa-angle-left pull-right"></i></a>
+              <ul class="treeview-menu">
+                <li class="{% is_active_resolve request 'webv2_data_preview' %}"><a href="{% url 'webv2_data_preview' %}">{% trans "数据预览" %}</a></li>
+                <li class="{% is_active_resolve request 'webv2_data_graphic' %}"><a href="{% url 'webv2_data_graphic' %}">{% trans "数据图示" %}</a></li>
+              </ul>
+            </li>
+
+            <li class="treeview">
+              <a href="javascript:;"><i class="fa fa-cloud-download"></i></i> <span>{% trans "下载固件" %}</span> <i class="fa fa-angle-left pull-right"></i></a>
+              <ul class="treeview-menu">
+                <li><a href="{% url 'webv2_down_roms' 'espush_sdk' %}">{% trans " SDK开发库" %}</a></li>
+                <li><a href="{% url 'webv2_down_roms' 'espush_at' %}">{% trans " AT固件" %}</a></li>
+                <li><a href="{% url 'webv2_down_roms' 'espush_nodemcu' %}">{% trans " NodeMCU固件" %}</a></li>
+              </ul>
+            </li>
+
+            <li><a href="http://docs.espush.cn/"><i class="fa fa-book"></i> <span>{% trans "文档" %}</span> <i class="fa fa-hand-right"></i></a></li>
+
+          </ul><!-- /.sidebar-menu -->
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+
+        <!-- Main content -->
+        <section class="content">
+
+        {% block content%}{% endblock %}
+        <!-- Your Page Content Here -->
+
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+
+
+      <!-- Main Footer -->
+<!--       <footer class="main-footer">
+        <div class="pull-right hidden-xs" title="webmaster@espush.cn">Feedback?</div>
+        <strong>Copyright &copy; <a href="/">espush.cn</a>.</strong> All rights reserved.
+      </footer>
+ -->
+    </div><!-- ./wrapper -->
+
+    {% block outerbody %} {% endblock %}
+    <script src="{% static 'webv2/js/jQuery-2.1.4.min.js' %}"></script>
+    <script src="{% static 'webv2/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'webv2/js/app.min.js' %}"></script>
+    {% block js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "webv2/base.html" %}
+{% block title %}Pushes History{% endblock %}
+{% load i18n %}
+{% block css %}
+{% endblock %}
+{% block content %}
+
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">{% trans '历史推送指令浏览' %}</h3>
+      </div><!-- /.box-header -->
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover table-responsive">
+          <thead>
+            <tr>
+              <th>{% trans '编号' %}</th>
+              <th>{% trans '产生时间' %}</th>
+              <th>{% trans '类型' %}</th>
+              <th>{% trans '目标或芯片' %}</th>
+              <th>{% trans '内容预览' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in records %}
+            <tr>
+              <td>{{record.id}}</td>
+              <td>{{record.create_time}}</td>
+              
+                {% ifequal record.msgtype "UPLOAD" %}
+                <td>设备上传</td>
+                <td><span title="{% trans '上传消息来源' %}">{{record.dev.chip}}</span></td>
+                {% endifequal %}
+
+                {% ifequal record.msgtype "PUSH_DEV" %}
+                <td>设备消息单推</td>
+                <td><span title="{% trans '单推至设备的消息' %}">{{record.dev.chip}}</span></td>
+                {% endifequal %}
+
+                {% ifequal record.msgtype "PUSH_APP" %}
+                <td>群推至设备</td>
+                <td><span title="{% trans '群推至设备类别' %}">{{record.app.app_name}}</span></td>
+                {% endifequal %}
+                
+              <td>{{record.msg_preview}}...</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">{% trans '暂空' %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- /.box-body -->
+
+      <div class="box-footer">
+      {% include "webv2/paginator.html" %}
+      </div>
+
+
+    </div><!-- /.box -->
+  </div>
+</div>
+
+{% endblock %}

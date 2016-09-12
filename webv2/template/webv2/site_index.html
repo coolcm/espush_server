@@ -1,0 +1,349 @@
+{% load i18n %}{% load static from staticfiles %}<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="espush, esp8266, 蘑菇云, 8266的云服务, 物联网，IoT Cloud on ESP8266">
+    <meta name="author" content="espush.cn">
+    <link rel="icon" href="/favicon.ico">
+    <title>{% trans "ESPUSH - 蘑菇云 - 物联网云开发平台" %}</title>
+    <link href="{% static 'webv2/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'webv2/css/landing-page.css' %}" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="{% static 'webv2/js/html5shiv.min.js' %}"></script>
+        <script src="{% static 'webv2/js/respond.min.js' %}"></script>
+    <![endif]-->
+    <!-- link prefetch resources.-->
+    <link rel="prefetch" href="{% static 'webv2/css/AdminLTE.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/css/font-awesome.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/css/adminlte_skin.min.css' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/app.min.js' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/qrcode.min.js' %}">
+    <link rel="prefetch" href="{% static 'webv2/js/md5.min.js' %}">
+    <!-- link prefetch end. -->
+    <style>
+a.qgroup_href {
+  padding: 0 !important;
+}
+
+a.qgroup_href img {
+  width: 258px;
+  height: 258px;
+}
+
+li.discuss ul {
+  width: 520px;
+}
+
+li.discuss ul li {
+  float: left;
+}
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+        <div class="container topnav" id="thetop">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">{% trans "导航" %}</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand topnav" href="javascript:;">ESPUSH 蘑菇云</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/webv2/">{% trans "云" %}</a>
+                    </li>
+
+                    <li>
+                        <a href="http://blog.espush.cn/">{% trans "博客" %}</a>
+                    </li>
+                    <li>
+                        <a href="http://docs.espush.cn/">{% trans "文档" %}</a>
+                    </li>
+                    <li>
+                        <a target="_blank" href="http://taobao.espush.cn/">{% trans "开发板" %}</a>
+                    </li>
+
+                    <li class="dropdown discuss">
+                      <a href="javascript:;" id="wechat_qgroup" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{% trans "讨论" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li title="espush 微信公众号">
+                          <img border="0" src="{% static 'webv2/images/wechat_qrcode.jpg' %}" alt="espush 微信公众号">
+                        </li>
+                        <li>
+                          <a href="http://shang.qq.com/wpa/qunwpa?idkey=c5f0d4bbb717db6b9b53d716adee7cc0826ce1152b7ad668daec2744a5730507"  class="qgroup_href" target="_blank" title="espush QQ群">
+                            <img border="0" src="{% static 'webv2/images/qgroup_qrcode.png' %}" alt="espush qgroup QQ群">
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li class="dropdown">
+                      <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{% trans "下载" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="/webv2/down_roms/espush_sdk/">{% trans "SDK开发包" %}</a></li>
+                        <li><a href="/webv2/down_roms/AT/">{% trans "AT固件" %}</a></li>
+                        <li><a href="/webv2/down_roms/NodeMCU/">{% trans "NodeMCU 固件" %}</a></li>
+                        <li><a href="http://pan.baidu.com/s/1boAOmcB" title="Based from Eclipse CDT">{% trans "IDE 开发环境" %}</a></li>
+                        <li><a href="/webv2/down_apk/">{% trans "Android APP" %}</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="http://pan.baidu.com/s/1skSIw25">{% trans "一键烧录" %}</a></li>
+                      </ul>
+                    </li>
+
+
+                    <li class="dropdown">
+                      <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{% trans "源码" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a target="_blank" href="https://github.com/pushdotccgzs/espush_sdk">espush_sdk</a></li>
+                        <li><a target="_blank" href="https://github.com/pushdotccgzs/espush_at">espush_at</a></li>
+
+                        <li><a target="_blank" href="https://github.com/pushdotccgzs/espush_android">espush_android</a></li>
+                        <li><a target="_blank" href="https://github.com/pushdotccgzs/espush_nodemcu">espush_nodemcu</a></li>
+                      </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle='dropdown' role="button" aria-haspopup="true" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                            {{ user.email }}
+                            <img src="{{user.gravatar_url}}?s=25" alt="" class="img-circle" style="height: 25px; width: 25px;"> <span class="caret"></span>
+                            {% else %}
+                            {% trans "未登录" %}
+                            <img src="/avatar/?s=25" alt="" class="img-circle" style="height: 25px; width: 25px;"> <span class="caret"></span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_authenticated %}
+                            {% else %}
+                            <li><a href="/webv2/login/">{% trans "登录" %}</a></li>
+                            <li><a href="/webv2/register/">{% trans "注册" %}</a></li>
+                        <li class="divider"></li>
+                            {% endif %}
+
+                            <li><a href="/webv2/">{% trans "管理控制台" %}</a></li>
+                            <li><a href="/webv2/logout/">{% trans "注销登录" %}</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="intro-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-message">
+                        <h1>{% trans "一起书写" %}</h1>
+                        <h3>{% trans "物联世界新篇章" %}</h3>
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a href="https://github.com/pushdotccgzs/" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                            </li>
+                            <li>
+                                <a href="http://blog.espush.cn/" class="btn btn-default btn-lg"><i class="glyphicon glyphicon-bold"></i> <span class="network-name">Blog</span></a>
+                            </li>
+
+                            {% if user.is_authenticated %}
+                            {% else %}
+                            <li>
+                                <a href="https://espush.cn/webv2/register/" class="btn btn-default btn-lg" title='{% trans "注册新用户 为你的WIFI设备开启便捷的云支持" %}'><i class="glyphicon glyphicon-user"></i> <span class="network-name">{% trans "注册新用户" %}</span></a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section-a">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    {% blocktrans %}
+                    <h2 class="section-heading">快速集成<br/>可直接产品化的云开发平台</h2>
+                    <p class="lead">只要<a href="http://blog.espush.cn/ten_minute_humiture_sensor.html">十分钟</a>，<a href="http://blog.espush.cn/ten_minute_socket.html">简单链接电路</a>，即可成型；无论使用何种开发模式，使用espush的云服务或解决方案，都可以快速的集成到您现有的系统、产品中去。</p>
+                    {% endblocktrans %}
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'webv2/images/quick.jpg' %}" alt="">
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="content-section-b">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    {% blocktrans %}
+                    <h2 class="section-heading">指令云推 首创推出</h2>
+                    <p class="lead">独创性率先推出的功能，可以直接在手机端，Web端推送控制指令到设备端。针对<a href="http://docs.espush.cn/at.html">AT固件</a>，您可以从云端执行任何合法的AT指令；针对<a href="http://docs.espush.cn/nodemcu.html">NodeMCU固件</a>，我们允许您直接推送Lua文件或Lua代码，为您提供最大程度的自由与灵活。</p>
+                    {% endblocktrans %}
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'webv2/images/pushcmd.jpg' %}" alt="">
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.content-section-b -->
+
+    <div class="content-section-a">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    {% blocktrans %}
+                    <h2 class="section-heading">服务端API<br>定制无限可能</h2>
+                    <p class="lead"><a href="http://docs.espush.cn/server.html">服务端API</a>提供更多功能，如远程GPIO控制，实时数据回调，云端固件升级等。固件与<a href="https://github.com/pushdotccgzs/espush_android">Android APP源码</a>托管于Github，且固件适配ESP8266多种玩家，如<a href="https://github.com/pushdotccgzs/espush_at">AT固件</a>，<a href="https://github.com/pushdotccgzs/espush_nodemcu">NodeMCU</a>，<a href="https://github.com/pushdotccgzs/espush_sdk">SDK开发包</a>等。</p>
+                    {% endblocktrans %}
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'webv2/images/serverapi.jpg' %}" alt="">
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="banner">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2></h2>
+                </div>
+                <div class="col-lg-6">
+                    <ul class="list-inline banner-social-buttons">
+                        <li>
+                            <a href="https://github.com/pushdotccgzs/" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">GitHub</span></a>
+                        </li>
+                        <li>
+                            <a href="http://blog.espush.cn/" class="btn btn-default btn-lg"> <span class="network-name">Blog</span></a>
+                        </li>
+                        <li>
+                            <a href="http://docs.espush.cn/" class="btn btn-default btn-lg"> <span class="network-name">Docs</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="list-inline">
+                        <li>
+                            <a href="/">{% trans "首页" %}</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="/webv2/">{% trans "控制台" %}</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="mailto:%77%65%62%6D%61%73%74%65%72%40%65%73%70%75%73%68%2E%63%6E">{% trans "联系我们" %}</a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted small">Copyright &copy; espush.cn 2015 - 2016. All Rights Reserved <a style="opacity: 0.45; filter:alpha(opacity=45);" href="http://www.miibeian.gov.cn">粤ICP备15051964号</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Modal -->
+    <div class="modal fade" id="myBoardSell" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">ESPUSH专属开发板</h4>
+          </div>
+          <div class="modal-body">
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+              <!-- Indicators -->
+              <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+              </ol>
+
+              <!-- Wrapper for slides -->
+              <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                  <a href="http://taobao.espush.cn/" target="_blank"><img src="{% static 'webv2/images/espush_board/01.jpg' %}" alt="espush 专属开发板"></a>
+                  <div class="carousel-caption">
+                    告别飞线，无忧开发。
+                  </div>
+                </div>
+                <div class="item">
+                  <a href="http://taobao.espush.cn/" target="_blank"><img src="{% static 'webv2/images/espush_board/02.jpg' %}" alt="espush 专属开发板"></a>
+                  <div class="carousel-caption">
+                    覆盖物联网开发最常见的开发场景，更有功能齐全的云服务。
+                  </div>
+                </div>
+                <div class="item">
+                  <a href="http://taobao.espush.cn/" target="_blank"><img src="{% static 'webv2/images/espush_board/03.jpg' %}" alt="espush 专属开发板"></a>
+                  <div class="carousel-caption">
+                    专属开发板，现已开售
+                  </div>
+                </div>
+
+              </div>
+              <!-- Controls -->
+              <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'webv2/js/jQuery-2.1.4.min.js' %}"></script>
+    <script src="{% static 'webv2/js/bootstrap.min.js' %}"></script>
+    <script type="application/javascript">
+        $('#myBoardSell').modal({
+            keyboard: true
+        });
+    </script>
+</body>
+</html>

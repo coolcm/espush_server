@@ -1,0 +1,55 @@
+{% extends "webv2/login_page.html" %}
+{% load i18n %}
+
+{% block title %}{% trans '注册新账号' %}{% endblock %}
+
+{% block content %}
+
+
+<div class="login-box-body">
+  <p class="login-box-msg">Register a new membership</p>
+  <form action="{% url 'webv2_register' %}" method="post" name='loginform' onsubmit="return validateForm()">
+    {% csrf_token %}
+    <div class="form-group has-feedback">
+      <input type="email" name="email" class="form-control" placeholder="Email">
+      <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+    </div>
+    <div class="form-group has-feedback">
+      <input type="password" name="password" class="form-control" placeholder="Password">
+      <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+    </div>
+    <div class="row">
+      <div class="col-xs-8">
+        <div class="checkbox">
+          <label>
+            <input name="remember" type="checkbox"> Remember Me
+          </label>
+        </div>
+      </div><!-- /.col -->
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Sign Up</button>
+      </div><!-- /.col -->
+    </div>
+  </form>
+
+  <a href="{% url 'webv2_forgot' %}">I forgot my password</a><br>
+  <a href="{% url 'webv2_login' %}" class="text-center"> I already have a membership</a>
+
+</div><!-- /.login-box-body -->
+
+  <script>
+  	function validateForm(){
+  		var email = document.forms["loginform"]["email"].value;
+  		var pass_word = document.forms["loginform"]["password"].value;
+  		if (email == null || email == "") {
+			alert("{% trans '邮箱必须填写' %}");
+			return false;
+			};
+  		if (pass_word == null || pass_word == "") {
+				alert("{% trans '密码必须填写' %}");
+				return false;
+			};
+  	}
+  </script>
+
+{% endblock %}

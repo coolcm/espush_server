@@ -1,0 +1,199 @@
+{% extends "webv2/base.html" %}
+{% load i18n %}
+{% load static from staticfiles %}
+{% block title %}Crontab{% endblock %}
+{% load i18n %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'webv2/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+
+{% block content %}
+{% verbatim %}
+<div class="ngapp" ng-app='consoleApp'>
+
+<div class="row" ng-controller='consoleController'>
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <!-- Custom Tabs -->
+    <div class="nav-tabs-custom">
+      <ul class="nav nav-tabs" id="mytab">
+        <li class="active"><a href="#tab_tasklist" data-toggle="tab">任务列表</a></li>
+        <!-- <li><a href="#tab_tasklog" data-toggle="tab">任务日志</a></li> -->
+        <li><a href="#tab_newtask" data-toggle="tab">新建计划任务</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab_tasklist">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <tr>
+                <th>任务名</th>
+                <th>设备</th>
+                <th>执行周期</th>
+                <th>创建时间</th>
+                <th>IO</th>
+                <th>Edge</th>
+                <th>操作</th>
+              </tr>
+              <tr ng-repeat='rule in rules'>
+                <td>{{rule.name}}</td>
+                <td>{{rule.appname}}</td>
+                <td>{{rule.cronval}}</td>
+                <td>{{rule.create_time}}</td>
+                <td>GPIO {{rule.pin}}</td>
+                <td>{{rule.edge}}</td>
+                <td>
+                  <a href="javascript:;" ng-click='remove_task(rule.id)'><i class="fa fa-remove"></i> 删除</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="box-footer">
+            <button class="btn btn-info" ng-click="change_new_task_tab()">新建任务计划</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.tab-pane -->
+
+<!--
+        <div class="tab-pane" id="tab_tasklog">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <tr>
+                <th>任务名</th>
+                <th>执行时间</th>
+                <th>执行结果</th>
+                <th>备注</th>
+              </tr>
+              <tr ng-repeat='log in logs'>
+                <td>{{log.name}}</td>
+                <td>{{log.exec_time}}</td>
+                <td>{{log.result}}</td>
+                <td>{{log.note}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+-->
+
+
+      <div class="tab-pane" id="tab_newtask">
+        <div class="form-horizontal">
+          <div class="box-body">
+            <div class="form-group">
+              <label for="inputName" class="col-sm-2 control-label">计划名称</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="inputName" ng-model='taskname' placeholder="任务名称">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputDevice" class="col-sm-2 control-label">设备类别</label>
+              <div class="col-sm-8">
+                <select class="form-control" id="inputDevice" ng-options='dev as dev.name for dev in devs track by dev.appid' ng-model='dev_selected'>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputType" class="col-sm-2 control-label">定时方式</label>
+              <div class="col-sm-10">
+                <label class="radio-inline">
+                  <input type="radio" name="inlineRadioOptions" id="once" ng-model="crontype" value="ONCE"> 指定日期时间
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="inlineRadioOptions" id="day_circle" ng-model="crontype" value="DAY_CIRCLE"> 每日循环
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="inlineRadioOptions" id="interval" ng-model="crontype" value="INTERVAL"> 间隔周期
+                </label>
+                <!-- <label class="radio-inline">
+                  <input type="radio" name="inlineRadioOptions" id="crontab" ng-model="crontype" value="CRONTAB"> Crontab
+                </label> -->
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-8">
+                <div ng-show='crontype=="ONCE"'>
+                    <input type="text" class="form-control" ng-model='once_val' id="once_picker" data-date-format="yyyy-mm-dd hh:ii" placeholder="点击选择日期时间 执行一次 执行完成后停止">
+                </div>
+                <div ng-show='crontype=="DAY_CIRCLE"'>
+                    <input type="text" class="form-control" ng-model='day_circle_val' id="day_circle_picker" data-date-format="hh:ii" placeholder="点击选择时间 每日定时执行 每日循环">
+                </div>
+                <div ng-show='crontype=="INTERVAL"'>
+                    <input type="number" class="form-control" ng-model='interval_val' id="interval_picker" placeholder="循环间隔周期 以秒为单位 现阶段不得低于30秒">
+                </div>
+                <div ng-show='crontype=="CRONTAB"'>
+                    <input type="text" class="form-control" ng-model='crontab_val' id="crontab_picker" placeholder="输入crontab表达式 空格分隔">
+                </div>
+              </div>
+            </div>
+            <div class="form-group" ng-show="crontype!=='ONCE'">
+              <label for="begin_end" class="col-sm-2 control-label">起止时间</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model='begin_date' id="begin_picker" data-date-format="yyyy-mm-dd hh:ii" placeholder="点击选择日期时间 默认为当下开始计时">
+              </div>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model='end_date' id="end_picker" data-date-format="yyyy-mm-dd hh:ii" placeholder="点击选择日期时间 至此结束 默认为「永久」">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">服务器时间</label>
+              <div class="col-sm-10">
+                <p class="form-control-static">{{current_server_timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputDevice" class="col-sm-2 control-label">操作</label>
+              <div class="col-sm-4">
+                <select class="form-control" id="input_pin" ng-model="pin_selected" ng-options='pin as pin.text for pin in pins track by pin.pin'>
+                </select>
+              </div>
+              <div class="col-sm-4">
+                <select class="form-control" id="input_edge" ng-model="edge_selected" ng-options='edge as edge.text for edge in edges track by edge.val'>
+                </select>
+              </div>
+            </div>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button type="submit" class="btn btn-info" ng-click='saveTask()'>保存</button>
+            <button type="submit" class="btn btn-default pull-right" ng-click="resetTask()">重置</button>
+          </div><!-- /.box-footer -->
+        </div>
+      </div><!-- /.tab-pane -->
+    </div><!-- /.tab-content -->
+    </div><!-- nav-tabs-custom -->
+  </div><!-- /.col -->
+  <warning ng-show='submit_warning'>{{warn_content}}</warning>
+</div> <!-- /.row -->
+</div>
+{% endverbatim %}
+{% endblock %}
+
+
+{% block js %}
+<script type="angular/template" id='warncontent'>
+<div class="callout callout-warning col-lg-8 col-md-10 col-sm-12 col-xs-12">
+  <h4>出错!</h4>
+  <p ng-transclude></p>
+</div>
+</script>
+<script src="{% static 'webv2/js/bootstrap-datetimepicker.min.js' %}"></script>
+<script>
+$('#once_picker').datetimepicker({
+  autoclose: true,
+  todayBtn: true
+});
+$('#day_circle_picker').datetimepicker({
+  startView: 'day',
+  autoclose: true,
+  initialDate: new Date(),
+});
+$("#begin_picker").datetimepicker({
+  autoclose: true,
+  todayBtn: true
+});
+$("#end_picker").datetimepicker({
+  autoclose: true,
+  todayBtn: true
+});
+</script>
+<script src="{% static 'webv2/js/angular.min.js' %}"></script>
+<script src="{% static 'webv2/js/crontab.app.js' %}"></script>
+{% endblock %}

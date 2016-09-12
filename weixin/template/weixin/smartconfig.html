@@ -1,0 +1,26 @@
+{% extends "weixin/base.html" %}
+{% load static from staticfiles %}
+{% block title %}SmartConfig 一键配置{% endblock %}
+
+{% block body_content %}
+<div class="container">
+  <div class="page">
+    <div class="hd">
+      <h1 class="page_title">配置设备中</h1>
+      <p class="page_desc">正在启用AirKiss连接设备...</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'weixin/js/jQuery-2.1.4.min.js' %}"></script>
+<script type="text/javascript">
+function wxready(res) {
+  WeixinJSBridge.invoke('configWXDeviceWiFi', {}, function(res) {
+    wx.closeWindow();
+  });
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,35 @@
+{% extends "webv2/login_page.html" %}
+{% block title %}iForgot{% endblock %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+{% block content %}
+
+<div class="login-box-body">
+  <p class="login-box-msg">{% trans '忘记密码 - 重置密码' %}</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group has-feedback">
+      <input type="email" name="email" class="form-control" placeholder="Email" autofocus="autofocus">
+      <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+    </div>
+    <img src="/webv2/identify_image/"><br/><br/>
+    <div class="form-group has-feedback">
+      <input type="text" name="code" class="form-control" placeholder="验证码">
+      <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+    </div>
+    <div class="row">
+      <div class="col-xs-8">
+      </div><!-- /.col -->
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary btn-block btn-flat">{% trans '重置密码' %}</button>
+      </div><!-- /.col -->
+    </div>
+  </form>
+
+  <a href="{% url 'webv2_login' %}" class="ajax_loading" data-dest="div.login-box-body" data-src="div.login-box-body">I already have a membership</a><br>
+  <a href="{% url 'webv2_register' %}" class="text-center ajax_loading" data-dest="div.login-box-body" data-src="div.login-box-body">Register a new membership</a>
+
+</div><!-- /.login-box-body -->
+{% endblock %}

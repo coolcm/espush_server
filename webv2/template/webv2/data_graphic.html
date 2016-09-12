@@ -1,0 +1,157 @@
+{% extends "webv2/base.html" %}
+{% load i18n %}
+{% load static from staticfiles %}
+{% block title %}Data Graphic{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'webv2/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+{% block content %}
+
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box box-primary">
+      <div class="box-header with-border">
+        <h3 class="box-title">{% trans '数据图示' %}</h3>
+      </div><!-- /.box-header -->
+
+        <div role="form" class="form-horizontal">
+          <div class="box-body">
+
+              <div class="row">
+                  <div class="col-md-10">
+                    <div class="form-group">
+                      <label for="data_src" class="col-sm-2 control-label">选择图示数据源</label>
+                      <div class="col-sm-10">
+                        <select name="app" id="data_src" class="form-control" >
+                          {% for app in apps %}
+                          <option value="{{app.id}}">{{app.app_name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+                     <div class="form-group">
+                      <label for="begin_date" class="col-sm-2 control-label">起止时间</label>
+                      <div class="col-sm-5">
+                        <input type="text" class="form-control" id="begin_date" data-date-format="yyyy-mm-dd" placeholder="点击选择数据上传的开始日期时间">
+                      </div>
+                      <div class="col-sm-5">
+                        <input type="text" class="form-control" id="end_date" data-date-format="yyyy-mm-dd" placeholder="点击选择数据终点日期时间">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="data_tag" class="col-sm-2 control-label">标签</label>
+                      <div class="col-sm-10">
+                          <input type="text" name="data_tag" id="data_tag" placeholder="数据标签值" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2"></div>
+              </div>
+
+          </div><!-- /.box-body -->
+
+          <div class="box-footer">
+            <button class="btn btn-primary" id="submit_btn">提交</button>
+          </div>
+        </div>
+
+        <div id="main" style="width: 600px;height:400px;"></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'webv2/js/bootstrap-datetimepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'webv2/js/echarts.min.js' %}"></script>
+
+<script type="text/javascript">
+$("#begin_date").datetimepicker({
+  autoclose: true,
+  todayBtn: true,
+    minView: 2
+});
+$("#end_date").datetimepicker({
+  autoclose: true,
+  todayBtn: true,
+    minView: 2
+});
+
+var draw_line = function(btn, echart) {
+  var data_src = $("#data_src").val();
+  if (!data_src) {
+    alert("需要选择有效的目标数据源，目前暂时只支持针对设备分类的数据源。");
+    return;
+  }
+
+  var data_tag = $("input#data_tag").val();
+  if(!data_tag) {
+    alert("需要输入有效的数据标签。");
+    return;
+  }
+
+  var begin_date =  $('input#begin_date').val();
+  if(!begin_date) {
+    alert("数据的开始日期？");
+    return;
+  }
+
+  var end_date = $('input#end_date').val();
+  if(!end_date) {
+    alert("数据的结束日期");
+    return;
+  }
+
+  var params = {
+    'data_src': data_src,
+    'data_tag': data_tag,
+    'begin_date': begin_date,
+    'end_date': end_date,
+  };
+
+  console.log(params);
+  $.post("", data=params).done(function(data) {
+    var option = {
+        tooltip: {
+            show: true
+        },
+        xAxis : [
+            {
+                type : 'category',
+                data : data.xSerial
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                "name":data_tag,
+                "type":"line",
+                "data": data.ySerial
+            }
+        ]
+    };
+
+    // 为echarts对象加载数据 
+    echart.setOption(option); 
+
+  }).fail(function() {
+    //
+  });
+};
+
+var myChart = echarts.init(document.getElementById('main'));
+
+$("button#submit_btn").click(function() {
+  draw_line(this, myChart);
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "webv2/base.html" %}
+{% load static from staticfiles %}
+{% block title %}IO Control{% endblock %}
+{% load i18n %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'webv2/css/bootstrap-switch.min.css' %}">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+    <div class="box box-primary">
+      <div class="box-header with-border">
+        <h3 class="box-title">Online Devices</h3>
+        <div class="box-tools pull-right">
+          <select class="form-control">
+              <option selected="selected">Select online Devices</option>
+            {% for dev in devs %}
+              <option data-appid="{{dev.appobj.id}}" data-chipid="{{dev.devid}}">
+                {{dev.devid}}
+                {% if dev.devname %}
+                - {{dev.devname}}
+                {% endif %}
+              </option>
+              {% empty %}
+              <option>empty</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <ul class="products-list product-list-in-box">
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io0.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 0 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                Samsung 32" 1080p 60Hz LED Smart HDTV.
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io4.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 4 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                26" Mongoose Dolomite Men's 7-speed, Navy Blue.
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io5.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 5 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                Xbox One Console Bundle with Halo Master Chief Collection.
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io12.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 12 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                PlayStation 4 500GB Console (PS4)
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io13.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 13 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                PlayStation 4 500GB Console (PS4)
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io14.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 14 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                PlayStation 4 500GB Console (PS4)
+              </span>
+            </div>
+          </li><!-- /.item -->
+          <li class="item">
+            <div class="product-img">
+              <img src="{% static 'webv2/img/io15.png' %}" alt="Product Image">
+            </div>
+            <div class="product-info">
+              <a class="product-title">GPIO 15 
+                <span class="label pull-right"><input id="switch-state" class="ioswitch" type="checkbox" checked></span>
+              </a>
+              <span class="product-description">
+                PlayStation 4 500GB Console (PS4)
+              </span>
+            </div>
+          </li><!-- /.item -->
+        </ul>
+      </div><!-- /.box-body -->
+    </div><!-- /.box -->
+  </div>
+</div>
+<!-- 0 4 5 12 13 14 15 -->
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'webv2/js/bootstrap-switch.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $("input.ioswitch").bootstrapSwitch({
+    onText: 'High',
+    offText: 'Low'
+  });
+  $("input.ioswitch").on('switchChange.bootstrapSwitch', function(evt, state) {
+    console.log(this);
+    console.log(evt);
+    console.log(state);
+  });
+});
+</script>
+{% endblock %}

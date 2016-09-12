@@ -1,0 +1,49 @@
+<nav>
+  <ul class="pagination" style="float: right;">
+    {% ifequal records.number 1 %}
+    <li class="disabled"><span>首</span></li>
+    {% else %}
+    <li><a href="?page=1">首</a></li>
+    {% endifequal %}
+
+    {% if records.has_previous %}
+    <li><a href="?page={{ records.number | add:-1 }}">前</a></li>
+
+      {% ifequal records.previous_page_number 1 %}
+      {% else %}
+      <li><a href="?page={{ records.previous_page_number | add:-1 }}">{{ records.previous_page_number | add:-1 }}</a></li>
+      {% endifequal %}
+      
+      {% if records.has_previous %}
+      <li><a href="?page={{records.previous_page_number}}">{{records.previous_page_number}}</a></li>
+      {% endif %}
+
+    {% else %}
+    <li class="disabled"><span>前</span></li>
+    {% endif %}
+
+    
+    <li class="active"><span>{{records.number}}</span></li>
+    
+    {% if records.has_next %}
+
+      <li><a href="?page={{ records.next_page_number }}">{{ records.next_page_number }}</a></li>
+
+      {% ifequal records.next_page_number records.paginator.num_pages %}
+      {% else %}
+      <li><a href="?page={{ records.next_page_number | add:1 }}">{{ records.next_page_number | add:1 }}</a></li>
+      {% endifequal %}
+
+      <li><a href="?page={{records.number | add:1 }}">后</a></li>
+
+    {% else %}
+    <li class="disabled"><span>后</span></li>
+    {% endif %}
+    
+    {% ifequal records.number records.paginator.num_pages %}
+    <li class="disabled"><span>末</span></li>
+    {% else %}
+    <li><a href="?page={{ records.paginator.num_pages }}">末</a></li>
+    {% endifequal %}
+  </ul>
+</nav>

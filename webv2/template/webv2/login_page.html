@@ -1,0 +1,28 @@
+{% load i18n %}{% load static from staticfiles %}<!DOCTYPE html>
+<html lang="zh-hans">
+  <head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1"> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock %} - ESPUSH</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{% static 'webv2/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'webv2/css/AdminLTE.min.css' %}">
+    <!--[if lt IE 9]>
+        <script src="{% static 'webv2/js/html5shiv.min.js' %}"></script>
+        <script src="{% static 'webv2/js/respond.min.js' %}"></script>
+    <![endif]-->
+  </head>
+  <body class="hold-transition login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <a href="/"><b>ES</b>push</a>
+      </div>
+
+      {% block content %}{% endblock %}
+
+    </div>
+    {% block js %}{% endblock %}
+  </body>
+</html>

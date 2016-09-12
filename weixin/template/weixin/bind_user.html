@@ -1,0 +1,59 @@
+{% extends "weixin/base.html" %}
+{% load static from staticfiles %}
+{% block title %}Bind WeChat{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'webv2/css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'webv2/css/AdminLTE.min.css' %}">
+{% endblock %}
+
+{% block body_content %}
+<div class="login-box">
+  <div class="login-logo">
+    <a href="/"><b>ES</b>push</a>
+  </div>
+
+    <div class="login-box-body">
+      <p class="login-box-msg">Sign in and Bind to your WeChat</p>
+      <div role='form' method="post">
+        <input type="hidden" id='openidinput' name='openid' value="{{openid}}">
+        <div class="form-group has-feedback">
+          <input type="email" name="email" id='emailinput' class="form-control" placeholder="Email">
+          <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+          <input type="password" name="password" id='passwordinput' class="form-control" placeholder="Password">
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">
+          </div><!-- /.col -->
+          <div class="col-xs-4">
+            <button class="btn btn-primary btn-block btn-flat btn-login">Bind Me</button>
+          </div><!-- /.col -->
+        </div>
+      </div>
+
+    </div><!-- /.login-box-body -->
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'weixin/js/jQuery-2.1.4.min.js' %}"></script>
+<script type="text/javascript">
+$("button.btn-login").on('click', function(evt) {
+  var url = "/weixin/bind_user_req/";
+  var args = {
+    openid: openidinput.value,
+    email: emailinput.value,
+    password: passwordinput.value
+  };
+  $.post(url, args).then(function(resp) {
+    alert('绑定用户成功');
+    wx.closeWindow();
+  }, function(xhr) {
+    alert('用户绑定失败: ' + xhr.responseText);
+  });
+});
+</script>
+{% endblock %}

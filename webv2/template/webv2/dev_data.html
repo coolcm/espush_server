@@ -1,0 +1,53 @@
+{% extends "webv2/base.html" %}
+{% load i18n %}
+{% load tz %}
+{% load static from staticfiles %}
+{% block title %}Device Uploaded data{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">{% trans '设备上传数据浏览' %}</h3>
+      </div><!-- /.box-header -->
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover table-responsive">
+          <thead>
+            <tr>
+              <th>{% trans '编号' %}</th>
+              <th>{% trans '发生时间' %}</th>
+              <th>{% trans '设备类别' %}</th>
+              <th>{% trans '内容预览' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in records %}
+            <tr>
+              <td>{{record.id}}</td>
+              <td>{{record.recv_time}}</td>
+            <td><span title="{% trans '设备数据上传' %}">{{record.app.app_name}}</span></td>
+              <td>{{record.msg_preview}}...</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">{% trans '暂空' %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- /.box-body -->
+
+      <div class="box-footer">
+      {% include "webv2/paginator.html" %}
+      </div>
+
+
+    </div><!-- /.box -->
+  </div>
+</div>
+
+
+{% endblock %}
