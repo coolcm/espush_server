@@ -458,8 +458,9 @@ def initlog(level=logging.DEBUG):
     :summary: 初始化日志，此处未使用twisted 的日志
     '''
     fmt = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
-    filehdl = logging.FileHandler('%s.log' %
-                                  os.path.basename(sys.argv[0]).split('.')[0])
+    logfilename = '%s.log' % os.path.basename(sys.argv[0]).split('.')[0]
+    logfullfilename = os.path.join(os.path.abspath('..'), 'log', logfilename)
+    filehdl = logging.FileHandler(logfullfilename)
     consolehdl = logging.StreamHandler()
     filehdl.setFormatter(fmt)
     consolehdl.setFormatter(fmt)

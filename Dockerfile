@@ -1,5 +1,7 @@
 FROM python:2.7
 
+MAINTAINER admin@espush.cn
+
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 

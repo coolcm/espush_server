@@ -162,6 +162,7 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
 # #日志处理
+logpath = os.path.join(BASE_DIR, 'log', 'espush.log')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -179,7 +180,7 @@ LOGGING = {
     'handlers': {
         'espush': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, "espush.log"),
+            'filename': logpath,
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
             'formatter': 'standard',
