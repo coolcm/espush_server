@@ -13,6 +13,7 @@ apscheduler==3.0.5
 sqlalchemy==0.9.6
 netifaces==0.10.4
 pg8000==1.10.6
+tornado==4.0
 
 # for production
 #uwsgi==2.0

@@ -76,3 +76,6 @@ python svc_espush.py &
 
 需要增加系统初始化脚本， 用作初始化数据库（并自动修改配置文件）、启动进程
 
+
+
+docker run -i -t --link db:db -e POSTGRES_PASSWORD=123456 espush/espush init

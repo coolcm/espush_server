@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import os
 import sys
+import urlparse
 import uuid
 import struct
 import pickle
@@ -90,7 +91,7 @@ class SvcConfig(object):
         }
         if not self.__cfg.read(cfgfilename):
             logger.error('配置文件读取错误 [%s]', cfgfilename)
-            return sys.exit(1)
+            sys.exit(1)
         try:
             self.routerip = self.__cfg.get(svctype, 'routerip')
             self.routerport = self.__cfg.getint(svctype, 'routerport')
@@ -102,17 +103,17 @@ class SvcConfig(object):
             self.__items = self.__cfg.items(svctype)
         except ConfigParser.NoSectionError as e:
             print('配置 [%s] 错误, [%s] -> 未找到' % (cfgfilename, e.section))
-            return sys.exit(1)
+            sys.exit(1)
         except ConfigParser.NoOptionError as e:
             print('配置 [%s] 错误, [%s] -> [%s]'
                   % (cfgfilename, e.section, e.option))
-            return sys.exit(1)
+            sys.exit(1)
         except ValueError as e:
             print('配置 [%s] 错误, [%s]' % (cfgfilename, e.message))
-            return sys.exit(1)
+            sys.exit(1)
         if self.loglevelname not in loglevels:
             print('配置 [%s] 错误, [%s] 值异常' % (cfgfilename, 'loglevel'))
-            return sys.exit(1)
+            sys.exit(1)
         self.loglevel = loglevels[self.loglevelname]
 
 
@@ -325,10 +326,19 @@ class DBopr(object):
         return adbapi.ConnectionPool('pg8000', **args)
 
     @staticmethod
+    def get_postgres_from_environ(dbconnstr):
+        urlobj = urlparse.urlparse(dbconnstr)
+        if urlobj.scheme not in ('postgres', 'postgresql'):
+            logger.warn('PostgreSQL 数据库连接配置错误！')
+            sys.exit(1)
+        dbuser = urlobj.netloc.split(':')[0]
+        dbpwd = urlobj.netloc.split(':')[1].split('@')[0]
+        dbhost = urlobj.netloc.split(':')[1].split('@')[1]
+        dbinst = urlobj.path[1:]
+        return adbapi.ConnectionPool('pg8000', host=dbhost, user=dbuser, password=dbpwd, database=dbinst)
+
+    @staticmethod
     def get_sqlite_pool(dbpath):
-        '''
-        :summary: 简单的单例处理，并没有做一些metaclass之类的，需要控制只能调用一次
-        '''
         base_dir = os.path.dirname(sys.argv[0])
         dbpath = os.path.join(base_dir, dbpath, 'db.sqlite3')
         if not os.path.isfile(dbpath):
@@ -340,11 +350,19 @@ class DBopr(object):
     def __init__(self, dbpath):
         # dbpath, sqlite:../../  postgres:user=123&password=132541&host=
         # self.dbpool = self.get_pool(dbpath)
-        dbtype, dbargs = dbpath.split(':')
-        if dbtype == 'sqlite':
-            self.dbpool = self.get_sqlite_pool(dbargs)
-        elif dbtype == 'postgres':
-            self.dbpool = self.get_postgres_pool(dbargs)
+        if dbpath:
+            dbtype, dbargs = dbpath.split(':')
+            if dbtype == 'sqlite':
+                self.dbpool = self.get_sqlite_pool(dbargs)
+            elif dbtype == 'postgres':
+                self.dbpool = self.get_postgres_pool(dbargs)
+        elif not dbpath and 'DBCONNSTR' in os.environ:
+            # from os.environ.
+            dbconn = os.environ['DBCONNSTR']
+            self.dbpool = self.get_postgres_from_environ(dbconn)
+        else:
+            logger.warn('数据库配置错误！')
+            sys.exit(1)
 
     def upload_msg_save(self, msg):
         def save_rec(txn):

@@ -10,7 +10,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import ConfigParser
+import sys
+import database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -23,9 +24,7 @@ SECRET_KEY = '1o5z^@fg5brb5+6#g&3ffet7vc#u4u4)9-u_@prn&1705dc&aw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-cfg = ConfigParser.SafeConfigParser()
-cfg.read(os.path.join(BASE_DIR, 'espush.ini'))
-DEBUG = cfg.getboolean('sys', 'debug')
+DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -90,6 +89,15 @@ LOGIN_URL = "/webv2/login/"
     },
 '''
 
+if 'DBCONNSTR' not in os.environ:
+    print('ERROR, cannot found database url.')
+    print('PLEASE, docker run -e DBCONNSTR=[Your Database]')
+else:
+    DATABASES = {
+        'default': database_url.parse(os.environ['DBCONNSTR'])
+    }
+
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -100,6 +108,7 @@ DATABASES = {
         'PORT': cfg.getint('sys', 'db_port')
     }
 }
+'''
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

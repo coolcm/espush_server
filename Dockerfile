@@ -10,8 +10,10 @@ COPY requirements.txt /usr/src/app
 RUN pip install --no-cache-dir  -i https://pypi.douban.com/simple -r requirements.txt && \
     rm -f requirements.txt
 
-VOLUME /usr/src/app
+ADD . /usr/src/app
+RUN chmod +x /usr/src/app/entrypoint.py
 
 EXPOSE 10081
 EXPOSE 8000
 
+ENTRYPOINT ["/usr/src/app/entrypoint.py"]

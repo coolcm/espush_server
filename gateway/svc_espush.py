@@ -823,11 +823,6 @@ def parseArgs(argv):
 if __name__ == '__main__':
     '''启动初始化函数
 
-    端口固化为10081与10082端口，可通过配置文件修改，记得同步修改Dockerfile
-    留意代码的listenTCP for webport，本处手动指定
-    listen tcp loopback addr
-    所以本模块的API只能被本机处理，也就是说只能被本机的服务器进程才能访问到。
-
     espush.cn推送服务器
 
     使用pure python、pure socket开发的tcp 推送服务器，与设备通过长连接保持，以实现对设备的实时控制
