@@ -1,55 +1,53 @@
 #tutorial
 
-- 准备工作
-docker pull espushcloud/espush
+##前置条件
 
+准备Ubuntu 14.04 或以上，CentOS 7 或以上的Linux系统，要求能正常使用Docker即可！分别使用
+```
+# Ubuntu
+apt-get install docker
+/etc/init.d/docker start
+```
+
+```
+# CentOS
+yum install docker
+systemctl start docker
+```
+
+安装docker。另外，可能需要关闭CentOS，尝试使用 `setenforce 0` 关闭SeLinux以避免奇奇怪怪的一些问题。
+
+
+##准备工作
+
+```
 docker pull postgres:9.5
-docker pull python:2.7
-git clone https://github.com/pushatccgzs/espush.git
+docker pull espushcloud/espush
+```
 
-- 系统初始化
-cd 
-docker build 
+##系统初始化
 
-- 访问
+新建用于数据库的目录，并启动数据库：
 
+```
+# 修改POSTGRES_PASSWORD其后的密码，并记住
+docker run -v `pwd`/data:/var/lib/postgresql/data --name db -e POSTGRES_PASSWORD=123456 -d postgres:9.5
+docker logs db
+#下面应该是你需要看到的postgres输出日志：
+...... 省略部分内容
+server stopped
+PostgreSQL init process complete; ready for start up.
+LOG:  database system was shut down at 2016-09-16 07:02:36 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+```
 
-- 初始化数据库
-docker run -v `pwd`/data:/var/lib/postgresql/data --name espush\_db -e POSTGRES\_PASSWORD=123456 -d postgres:9.5
-docker logs espush\_db
-
-    PostgreSQL init process complete; ready for start up.
-    LOG:  database system was shut down at 2016-09-12 15:45:15 UTC
-    LOG:  MultiXact member wraparound protections are now enabled
-    LOG:  database system is ready to accept connections
-    LOG:  autovacuum launcher started
-    
-
-docker run -i -t --link espush_db:espush_db postgres:9.5 psql -h espush_db -U postgres
-输入密码后新建用户与数据库环境
-create user espush createdb ;
-alter user espush with password '123456';
-\c template1 espush
-create database espush;
-
-cd espush
-docker run --name dbinit -i -t --link espush_db:espush_db -v `pwd`:/usr/src/app espush/espush /bin/bash
-
-编辑espush.ini，为刚刚配置的数据库信息
-
-python manage.py makemigrations webv2
-python manage.py makemigrations weixin
-python manage.py migrate
-
-
-root@a653d9ee1837:/usr/src/app# python manage.py migrate
-Operations to perform:
-  Synchronize unmigrated apps: staticfiles, messages
-  Apply all migrations: webv2, admin, sessions, auth, weixin, contenttypes
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-  Installing custom SQL...
+数据库即告启动完成，接下来需要初始化数据库表结构，执行命令：
+```
+# 同样留意修改对应的密码，为上面初始化的密码。指定运行参数为init；
+docker run -i -t --link db:db -e POSTGRES_PASSWORD=123456 espushcloud/server:latest init
+# Database Username [default: espush]> 提示输入数据库用户名、密码、数据库实例名，管理员邮箱、密码，完成后提示如下：
 Running migrations:
   Rendering model states... DONE
   Applying webv2.0001_initial... OK
@@ -64,18 +62,25 @@ Running migrations:
   Applying auth.0006_require_contenttypes_0002... OK
   Applying sessions.0001_initial... OK
   Applying weixin.0001_initial... OK
+```
+
+##启动服务器与Web
+```
+docker run --name espush -d -p 10081:10081 -p 8000:8000 --link db:db espushcloud/server
+docker logs espush
+```
+
+完！
+
+##总结
+```
+yum install docker # apt-get install docker
+systemctl start docker
+docker pull postgres:9.5
+docker pull espushcloud/server:latest
+docker run -v `pwd`/data:/var/lib/postgresql/data --name db -e POSTGRES_PASSWORD=123456 -d postgres:9.5
+docker run -i -t --link db:db -e POSTGRES_PASSWORD=123456 espushcloud/server:latest init
+docker run --name espush -d -p 10081:10081 -p 8000:8000 --link db:db espushcloud/server
+```
 
 
-- 启动系统
-docker run --name espush -i -t -p 10081:10081 -p 8000:8000 --link espush_db:espush_db -v `pwd`:/usr/src/app espush/espush /bin/bash
-
-python manage.py runserver 0.0.0.0:8000 &
-cd gateway
-python router.py &
-python svc_espush.py &
-
-需要增加系统初始化脚本， 用作初始化数据库（并自动修改配置文件）、启动进程
-
-
-
-docker run -i -t --link db:db -e POSTGRES_PASSWORD=123456 espush/espush init
